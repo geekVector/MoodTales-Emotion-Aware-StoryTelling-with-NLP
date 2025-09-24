@@ -4,3 +4,6 @@ scikit-learn
 xgboost
 nltk
 regex
+google.generativeai
+joblib
+streamlit
