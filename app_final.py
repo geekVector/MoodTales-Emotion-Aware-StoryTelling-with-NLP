@@ -118,7 +118,7 @@ st.title("📖 MoodTales: Emotion Aware StoryTelling with NLP")
 st.caption("Turn raw feeling into fiction — powered by your sentiment model + Google Gemini API.")
 
 # Input area
-user_input = st.text_area("Paste text to gauge sentiment (tweet, review, paragraph, etc.)", height=150, placeholder="Type or paste some text…")
+user_input = st.text_area("What's up mate? How are you feeling!", height=150, placeholder="Type or paste some text…")
 word_limit = st.slider("Adjust story length (in words)", min_value=50, max_value=300, value=120)
 
 analyze_btn = st.button("🔍 Analyze & Generate Story", type="primary")
