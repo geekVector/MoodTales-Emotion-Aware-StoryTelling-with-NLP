@@ -8,6 +8,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import traceback
 
+nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
