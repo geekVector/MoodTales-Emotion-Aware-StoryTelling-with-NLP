@@ -8,6 +8,10 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import traceback
 
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
 # --- Page config ---
 st.set_page_config(page_title="MoodForge: Emotion Aware StoryTelling with NLP", page_icon="📖")
 
@@ -92,8 +96,7 @@ def preprocess_text(text):
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return ' '.join(tokens)
 
-# --- Generate story and cache the result ---
-@st.cache_data(show_spinner=False)
+# --- Generate story (without caching) ---
 def generate_story(prediction, word_limit):
     """Generates a story based on sentiment using the Gemini API."""
     prompt = f"Create a unique and interesting short story with normal english words (less than {word_limit} words) based on {prediction} mood."
