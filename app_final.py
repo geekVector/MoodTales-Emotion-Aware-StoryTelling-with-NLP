@@ -101,7 +101,7 @@ def preprocess_text(text):
 # --- Generate story (without caching) ---
 def generate_story(prediction, word_limit):
     """Generates a story based on sentiment using the Gemini API."""
-    prompt = f"Create a unique and interesting short story with normal english words (less than {word_limit} words) based on {prediction} mood."
+    prompt = f"Write a unique, suspenseful short story that instantly captures the reader’s attention in the first paragraph with a mysterious or shocking event. The story should revolve around a main character who discovers a hidden truth that turns their reality upside down. Introduce escalating layers of suspense, including red herrings, unexpected betrayals, and moral dilemmas. Structure the plot with rising tension in every scene, ending each major section with a cliffhanger or unanswered question that compels the reader to continue. Set the story in an unusual or eerie setting (e.g., abandoned town, remote island, underground facility). Create emotionally engaging stakes by tying the mystery to the character’s past or relationships. The final twist should reframe everything the reader thought they knew, leaving a lingering question or emotional impact. Do not resolve everything neatly—leave room for interpretation (less than {word_limit} words) and based on this {prediction} mood"
     
     try:
         model = genai.GenerativeModel('gemini-2.0-flash')
