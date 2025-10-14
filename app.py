@@ -145,7 +145,7 @@ def get_live_data():
         loc_res.raise_for_status()
         loc_data = loc_res.json()
         city, country = loc_data.get("city", "Unknown"), loc_data.get("country", "")
-        weather_api_key = st.secrets.get("weather_api_key", "")
+        weather_api_key = weather_api_key
         if not weather_api_key:
             st.error("Weather API key not found. Please add it to your Streamlit secrets.")
             return f'{city}, {country}', None
