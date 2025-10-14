@@ -11,6 +11,11 @@ import google.generativeai as genai
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+
+#api keys
+weather_api_key = "c87ed51b805675cdc2eababdb7cc294b"
+google_api_key="AIzaSyAT4Tmn5UTjDt92kbPOPAKf_L5iINbyrNk"
+
 # --- AI and Model Configuration ---
 
 # Securely configure the Google Gemini API
@@ -22,7 +27,7 @@ except Exception as e:
 # --- Dictionaries for Mood Customization ---
 
 color_palette = {
-    "Happy":   ["#F1E7E7", "#E69DB8", "#FFD0C7", "#FFFECE"],
+    "Happy":   ["#D8E614", "#E69DB8", "#1AB2E0", "#0CEA40"],
     "Sad":     ["#222831", "#174CA0", "#483518", "#24262C"],
 }
 mood_emojis = {
@@ -106,7 +111,7 @@ def apply_mood_theme(mood):
             {story_box_base_style}
         }}"""
         ui_style = f"""
-        {text_selectors} {{ color: #EAEAEA; transition: color 0.5s ease; }}
+        {text_selectors} {{ color: #000000; transition: color 0.5s ease; }}
         .info-box {{ background-color: rgba(0, 0, 0, 0.25); border: 1px solid #888; {info_box_base_style} }}
         """
     else:
@@ -182,7 +187,7 @@ def preprocess_text(text):
     return ' '.join(tokens)
 
 def story_generation(sentiment, word_limit=150):
-    prompt = (
+    prompt = prompt = (
         f"Write a unique, suspenseful short story that instantly captures the reader’s attention in the first paragraph "
         f"with a mysterious or shocking event. The story should revolve around a main character who discovers a hidden truth "
         f"that turns their reality upside down. Introduce escalating layers of suspense, including red herrings, "
@@ -192,7 +197,7 @@ def story_generation(sentiment, word_limit=150):
         f"Create emotionally engaging stakes by tying the mystery to the character’s past or relationships. "
         f"The final twist should reframe everything the reader thought they knew, leaving a lingering question or emotional impact. "
         f"Do not resolve everything neatly—leave room for interpretation. "
-        f"Keep the story under {word_limit} words, and ensure the tone is influenced by the user's **{sentiment}** feeling."
+        f"Keep the story under {word_limit} words, and ensure the tone is influenced by the user's *{sentiment}* feeling."
     )
     try:
         model = genai.GenerativeModel('gemini-2.0-flash')  # ✅ updated model name
@@ -227,8 +232,9 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 # Top Info Bar
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, gap="large")
 with col1:
     st.markdown(f'<div class="info-box"><img src="{utility_emojis["clock"]}" class="top-bar-emoji"><div class="info-text">{datetime.now().strftime("%d %b, %I:%M %p")}</div></div>', unsafe_allow_html=True)
 with col2:
@@ -264,6 +270,14 @@ else:
         st.markdown(f"<div id='moodDisplay'>Your current mood is: <strong>{st.session_state.mood}</strong></div>", unsafe_allow_html=True)
 
     mood_text = st.text_area("Type something about your mood...", placeholder=f"How are you feeling today, {st.session_state.username}?", height=100)
+    word_limit = st.slider(
+    "Select your desired story length (in words):",
+    min_value=50,
+    max_value=400,
+    value=150,
+    step=10,
+    help="Adjust the slider to control how long your story will be."
+)
 
     if st.button("✨ Generate Story ✨", use_container_width=True):
         if mood_text and pipeline:
@@ -273,7 +287,7 @@ else:
                 sentiment = 'Happy' if prediction[0] == 4 else 'Sad'
                 
                 st.session_state.mood = sentiment
-            st.session_state.story = story_generation(sentiment)
+            st.session_state.story = story_generation(sentiment, word_limit)
             st.session_state.mood_emoji_url = mood_emojis.get(st.session_state.mood, mood_emojis["Neutral"])
             st.rerun()  # ✅ instant theme + story refresh
         elif not mood_text:
