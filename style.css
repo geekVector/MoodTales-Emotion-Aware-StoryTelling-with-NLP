@@ -1,0 +1,494 @@
+/* In style.css, ensure the body rule is clean */
+body {
+    color: var(--text-color);
+}
+/* General container */
+.container {
+  max-width: 700px;
+  margin: 50px auto;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 35px; /* clean spacing between each section */
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Heading section */
+.heading-section h1 {
+  font-size: 28px;
+  font-weight: 700;
+ color: black; /* This will be the color that gets inverted */
+  mix-blend-mode: difference;
+  text-align: center;
+  margin: 0;
+}
+
+/* Emoji + mood section */
+.emoji-section {
+  text-align: center;
+}
+.emoji-box {
+  font-size: 96px;
+  margin-bottom: 15px;
+}
+.emoji-box img {
+  width: 80px;  /* adjust size */
+  height: 80px;
+  object-fit: contain;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+.emoji-box, #moodEmoji {
+  text-align: center;
+}
+
+.emoji-img {
+  width: 80px;      /* adjust size as needed */
+  height: 80px;
+  object-fit: contain;
+}
+
+#moodDisplay {
+  font-size: 18px;
+  font-weight: 600;
+  color: #555;
+}
+
+
+
+
+/* Prompt section */
+.prompt-section {
+  text-align: center; /* Centers the textarea container */
+  margin-top: 20px;   /* Adds spacing above the textarea */
+}
+
+
+.prompt-section textarea {
+  width: 70%;
+  min-height: 100px;
+  max-width: 600px;     /* Optional: limits width on large screens */
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  padding: 12px 14px;   /* Slightly smaller padding */
+  resize: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  display: inline-block; /* Makes textarea respect text-align center */
+}
+
+.prompt-section textarea:focus {
+  outline: none;
+  border: 1px solid #a370f0;
+  box-shadow: 0 0 6px rgba(163, 112, 240, 0.3);
+}
+
+
+/* Button section (centered button) */
+.button-section {
+  display: flex;
+  justify-content: center;
+}
+
+/* Story section */
+.story-section {
+  text-align: center;
+}
+#storyLink {
+  font-weight: 600;
+  text-decoration: none;
+  color: #7b52b9;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+#storyLink:hover {
+  text-decoration: underline;
+  color: #5b3b8a;
+}
+#storyLinkBox {
+  margin-top: 20px;
+  text-align: center;
+}
+#storyLink {
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+}
+.hidden {
+  display: none;
+}
+.fade-heading {
+    transition: opacity 0.8s ease-in-out;
+    opacity: 1;
+  }
+
+#greetingMessage {
+  margin-top: 90px;   /* creates space below the top bar */
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+}
+
+/* style.css */
+
+/* Replace the old #dynamicHeading and its keyframes with this */
+#dynamicHeading {
+    text-align: center;
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    height: 40px; /* Give it a fixed height to prevent layout shifts */
+    position: relative;
+    font-family: var(--font-neutral); 
+    color: #000000;/* Use a default font */
+}
+
+/* Use a pseudo-element to hold and animate the text content */
+#dynamicHeading::after {
+    content: "AI Mood Adaptive Story"; /* The first heading text */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: cycleHeadings 20s linear infinite; /* 2s per heading * 10 headings */
+}
+
+@keyframes cycleHeadings {
+    0%   { content: "AI Mood Adaptive Story"; opacity: 1; }
+    9%   { opacity: 0; }
+    
+    10%  { content: "What Story Fits Your Mood?"; opacity: 1; }
+    19%  { opacity: 0; }
+    
+    20%  { content: "Discover Your Mood's Tale"; opacity: 1; }
+    29%  { opacity: 0; }
+
+    30%  { content: "Mood-Driven Stories"; opacity: 1; }
+    39%  { opacity: 0; }
+
+    40%  { content: "Stories That Match Your Mood"; opacity: 1; }
+    49%  { opacity: 0; }
+
+    50%  { content: "Your Mood, Your Story"; opacity: 1; }
+    59%  { opacity: 0; }
+    
+    60%  { content: "Feelings to Fiction"; opacity: 1; }
+    69%  { opacity: 0; }
+    
+    70%  { content: "Emotional Storytelling"; opacity: 1; }
+    79%  { opacity: 0; }
+
+    80%  { content: "AI-Powered Mood Stories"; opacity: 1; }
+    89%  { opacity: 0; }
+
+    90%  { content: "Unlock Stories with Your Mood"; opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Also add this to ensure the story font applies correctly */
+.story-container {
+    color: var(--text-color);
+}
+#moodEmoji {
+  margin-top: 20px;
+}
+/* Hover effect for dynamic heading */
+#dynamicHeading:hover {
+  color: #00cff4;
+  transform: scale(1.1) rotate(-2deg);
+  text-shadow: 0 0 15px rgba(255, 235, 59, 0.7);
+  cursor: pointer;
+}
+
+/* Click animation for dynamic heading */
+#dynamicHeading.clicked {
+  animation: wiggle 0.5s ease;
+}
+
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(3deg); }
+  100% { transform: rotate(0deg); }
+}
+#greetingMessage {
+  font-size: 2rem;
+  margin: 20px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect like h1 */
+#greetingMessage:hover {
+  color: #ffeb3b;
+  transform: scale(1.05) rotate(-2deg);
+  text-shadow: 0 0 15px rgba(255, 235, 59, 0.7);
+}
+
+/* Click animation */
+#greetingMessage.clicked {
+  animation: wiggle 0.5s ease;
+}
+
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(3deg); }
+  100% { transform: rotate(0deg); }
+}
+/* Top bar styles */
+.top-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 900px;
+  margin: auto;
+  gap: 30px;
+}
+
+.info-box {
+  flex: 1;
+  display: flex;                     /* Arrange emoji + text side by side */
+  align-items: center;               /* Vertical alignment */
+  gap: 25px;                         /* Space between emoji & text */
+  background:white;
+  color: #000000;
+  padding: 15px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: default;
+}
+
+.info-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Emoji box like mood emoji */
+/* Replace the old .top-bar-emoji rule with this one */
+.top-bar-emoji {
+    width: 30px;      /* Changed from 40px to 30px */
+    height: 30px;     /* Changed from 40px to 30px */
+    margin-right: 12px;
+    object-fit: contain;
+}
+/* Text */
+.info-text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Weather icons (fallback from API) */
+.weather-icon {
+  vertical-align: middle;
+  height: 24px;
+}
+
+@media(max-width: 600px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+/*button.css*/
+.cssbuttons-io-button {
+  background: linear-gradient(135deg, #a370f0, #7b52b9);
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 0.35em 3.3em 0.35em 1.2em;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: 0.9em;
+  border: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(123, 82, 185, 0.4);
+  overflow: hidden;
+  position: relative;
+  height: 3em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Subtle lift on hover */
+.cssbuttons-io-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #925ef5, #6939a5);
+}
+
+/* Inner icon box */
+.cssbuttons-io-button .icon {
+  background: white;
+  margin-left: 1em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2em;
+  width: 2.2em;
+  border-radius: 0.7em;
+  box-shadow: 0.1em 0.1em 0.6em rgba(123, 82, 185, 0.4);
+  right: 0.3em;
+  transition: all 0.3s ease;
+}
+
+/* Icon expands smoothly on hover */
+.cssbuttons-io-button:hover .icon {
+  width: calc(100% - 0.6em);
+  border-radius: 0.9em;
+}
+
+/* Arrow inside */
+.cssbuttons-io-button .icon svg {
+  width: 1.1em;
+  transition: transform 0.3s ease;
+  color: #7b52b9;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+  transform: translateX(0.2em);
+}
+
+/* Click effect */
+.cssbuttons-io-button:active {
+  transform: scale(0.97);
+}
+
+.cssbuttons-io-button:active .icon {
+  transform: scale(0.95);
+}
+
+
+/* Read now button css*/
+/* From Uiverse.io by vinodjangid07 */ 
+.button-wrapper {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically */
+  height: 10vh;           /* full screen height */
+}
+
+.bookmarkBtn {
+  width: 100px;
+  height: 40px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.349);
+  background-color: rgb(12, 12, 12);
+  display: flex;              /* ✅ FIXED */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition-duration: 0.3s;
+  overflow: hidden;
+  gap: 6px;
+}
+
+.IconContainer {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(to bottom, rgb(255, 136, 255), rgb(172, 70, 255));
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 2;
+  transition-duration: 0.3s;
+}
+
+.icon {
+  border-radius: 1px;
+  fill: black;   /* make sure icon stays visible */
+}
+
+.text {
+  height: 100%;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 1;
+  transition-duration: 0.3s;
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.bookmarkBtn:hover .IconContainer {
+  width: 90px;
+  transition-duration: 0.3s;
+}
+
+.bookmarkBtn:hover .text {
+  transform: translate(10px);
+  width: 0;
+  font-size: 0;
+  transition-duration: 0.3s;
+}
+
+.bookmarkBtn:active {
+  transform: scale(0.95);
+  transition-duration: 0.3s;
+}
+/*footer.css*/
+.dynamic-footer {
+    background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 40px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-in-out; /* This makes the hover effect smooth */
+}
+
+.dynamic-footer:hover {
+    transform: translateY(-5px); /* Lifts the box up slightly */
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Makes the shadow more pronounced */
+}
+
+.footer-heading {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.footer-description {
+    color: #555;
+    font-size: 1.1em;
+}
+/* Add this to your style.css file */
+.stTextInput input {
+    color: white;
+}
+/* Story Output Section */
+.story-output {
+  background: transparent;       /* Keep same background as page */
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 25px;
+  font-size: 18px;
+  line-height: 1.6;
+  text-align: left;
+  font-family: "Georgia", serif;
+  word-wrap: break-word;
+  /* Automatically use black or opposite color based on background */
+  color: color-mix(in srgb, var(--text-color) 0%, black 100%);
+  /* fallback if color-mix unsupported */
+  mix-blend-mode: difference;
+}
+
+/* Optional glowing hover for story text */
+.story-output:hover {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
