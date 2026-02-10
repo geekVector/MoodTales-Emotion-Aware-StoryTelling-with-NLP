@@ -11,40 +11,41 @@ import google.generativeai as genai
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-
-#api keys
-weather_api_key = "c87ed51b805675cdc2eababdb7cc294b"
-google_api_key="AIzaSyAT4Tmn5UTjDt92kbPOPAKf_L5iINbyrNk"
-
 # --- AI and Model Configuration ---
+nltk.download('punkt')
+nltk.download('punkt_tab')
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 
 # Securely configure the Google Gemini API
 try:
-    genai.configure(api_key=st.secrets["google_api_key"])
+    genai.configure(api_key="AIzaSyAT4Tmn5UTjDt92kbPOPAKf_L5iINbyrNk")
 except Exception as e:
     st.error("Google API Key not found. Please add it to your Streamlit secrets.", icon="🔑")
 
 # --- Dictionaries for Mood Customization ---
 
 color_palette = {
-    "Happy":   ["#D8E614", "#E69DB8", "#1AB2E0", "#0CEA40"],
-    "Sad":     ["#222831", "#174CA0", "#483518", "#24262C"],
+    "Happy":   ["#FFD700", "#FF5722", "#D8E089", "#A84E6C"],
+    "Sad":     ["#39546D", "#13143B", "#192D31", "#000000"],
+    "Neutral": ["#745F47", "#77B177", "#9566A3", "#4B4B4B"]
 }
 mood_emojis = {
-    "Happy": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f60a/512.gif",
-    "Sad": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f622/512.gif",
-    "Neutral": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f610/512.gif"
+    "Happy": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHEyZ3BsYnh5MWxnenp1a3l0amplcnlsdHNtZWl0emhndzB6ejhzaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif",
+    "Sad": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaXIyejVyNXVucHdhczR1OWVxYnM4NTJkZTV5OGttcDlrcDhleXQydyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/fhLgA6nJec3Cw/giphy.gif",
+    "Neutral": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2VxeWpnNXNydTB2cTJ0cm5nYzhxczE4d3B6bTkzNTdkaTNicjdhOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iyCUpd3MOYLf8COyPQ/giphy.gif"
 }
 utility_emojis = {
-    "clock": "https://fonts.gstatic.com/s/e/notoemoji/latest/23f0/512.gif",
-    "globe": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f30d/512.gif",
-    "rainyCloud": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f327/512.gif",
-    "lightningCloud": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f329/512.gif"
+    "clock": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanVlZ2puNjdzd3I5NjUwOW13aXlkd3ljZWxzYzAxa2dsczh4a2Z2dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/2zdVnsL3mbrs4xg4fr/giphy.gif",
+    "globe": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExajhzaHdvMm05a29zcTNibzdjeTdpdHAxYzc5eHc3YmJienloYXk4ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/mf8UbIDew7e8g/giphy.gif",
+    "rainyCloud": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2t5eWs2aTl4OTJpeTF4MjJ6NDNxNmpxbGFjYjR1eng1Y2p1aW95dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/gk3s6G7AdUNkey0YpE/giphy.gif",
+    "lightningCloud": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2t5eWs2aTl4OTJpeTF4MjJ6NDNxNmpxbGFjYjR1eng1Y2p1aW95dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xaZCqV4weJwHu/giphy.gif"
 }
 
 # --- Page and Session State Initialization ---
 
-st.set_page_config(layout="wide", page_title="Mood Adaptive Story")
+st.set_page_config(layout="wide", page_title=" AI Mood Adaptive Story")
 
 if 'username' not in st.session_state:
     st.session_state.username = ""
@@ -58,6 +59,9 @@ if 'weather_data' not in st.session_state:
     st.session_state.weather_data = None
 if 'heading_index' not in st.session_state:
     st.session_state.heading_index = 0
+if 'mood_history' not in st.session_state:
+    st.session_state.mood_history = []
+
 
 # --- Asset Loading and Backend Logic ---
 
@@ -70,74 +74,112 @@ def get_local_css(file_name):
         st.error(f"CSS file not found: {file_name}. Please ensure 'style.css' is present.")
         return ""
 
-# REPLACE your apply_mood_theme function with this final version
+# --- UPDATED: apply_mood_theme function for single, high-contrast background emoji ---
 
 def apply_mood_theme(mood):
-    colors = color_palette.get(mood, ["#000000"])  # default to black
-
-    duration = len(colors) * 3
+    emoji_url = mood_emojis.get(mood, mood_emojis["Neutral"])
     
-    # --- Generate CSS for background animation ---
-    keyframes = "@keyframes moodCycle {\n"
-    step = 100 / len(colors)
-    for i, color in enumerate(colors):
-        keyframes += f"  {i * step}% {{ background: {color}; }}\n"
-    keyframes += f"  100% {{ background: {colors[0]}; }}\n}}"
-
-    # --- NEW: Generate CSS for ALL UI elements based on the mood ---
-    dark_themes = {"Sad", "Angry", "Fear", "Disgust"}
+    # Define text colors for maximum contrast
+    if mood == "Sad":
+        text_color = "#FFFFFF"  # White text for high contrast on dark backgrounds
+        story_box_bg = "rgba(0, 0, 0, 0.6)" # Darker story box for legibility
+        base_bg_color = "#202020" # Dark base background color
+        background_opacity = 0.5 # Increased opacity for higher contrast on dark theme
+    else:
+        text_color = "#1E1E1E"  # Near-black text for high contrast on light/bright backgrounds
+        story_box_bg = "rgba(255, 255, 255, 0.85)" # Lighter, almost opaque story box for legibility
+        base_bg_color = "#F0F0F0" # Light base background color
+        background_opacity = 0.3 # Increased opacity for higher contrast on light theme
     
     # Define common styles for consistent box shapes
-    story_box_base_style = """
+    story_box_base_style = f"""
         border-radius: 10px; padding: 20px; margin-top: 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15); font-size: 1.1em; line-height: 1.6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5); /* Increased shadow for lift and contrast */
+        font-size: 1.1em; line-height: 1.6;
         transition: background-color 0.5s ease, color 0.5s ease, border 0.5s ease;
     """
     info_box_base_style = "border-radius: 10px; transition: background-color 0.5s ease, border 0.5s ease;"
 
     # Selectors for all text elements we want to change
-    text_selectors = "h1, h2, h3, .info-text, #greetingMessage, #moodDisplay, label, .footer-heading, .footer-description, div[data-testid='stMarkdown'] p"
-
-    story_box_style = ""
-    ui_style = ""
-
-    if mood in dark_themes:
-        # --- Styles for DARK themes ---
-        story_box_style = f"""
+    text_selectors = "h1, h2, h3, .info-text, #greetingMessage, #moodDisplay, label, .footer-heading, .footer-description, div[data-testid='stMarkdown'] p, .stMarkdown"
+    
+    # --- Styles for story box and general UI ---
+    story_box_style = f"""
         .story-container {{
-            background-color: rgba(230, 230, 230, 0.9);
-            color: #1c1c1c;
-            border: 1px solid #777;
+            background-color: {story_box_bg};
+            color: {text_color};
+            border: 1px solid {text_color}44; /* Subtle border */
             {story_box_base_style}
         }}"""
-        ui_style = f"""
+    
+    ui_style = f"""
         {text_selectors} {{ color: #000000; transition: color 0.5s ease; }}
-        .info-box {{ background-color: rgba(0, 0, 0, 0.25); border: 1px solid #888; {info_box_base_style} }}
-        """
-    else:
-        # --- Styles for LIGHT themes ---
-        story_box_style = f"""
-        .story-container {{
-            background-color: rgba(255, 255, 255, 0.7);
-            color: #2a2a2a;
-            border: 1px solid #ccc;
-            {story_box_base_style}
-        }}"""
-        ui_style = f"""
-        {text_selectors} {{ color: #1E1E1E; transition: color 0.5s ease; }}
-        .info-box {{ background-color: rgba(255, 255, 255, 0.5); border: 1px solid #ddd; {info_box_base_style} }}
-        """
+        .info-box {{ 
+            background-color: {story_box_bg.replace('0.85', '0.6').replace('0.6', '0.4')}; 
+            border: 1px solid {text_color}33; 
+            {info_box_base_style} 
+        }}
+        /* Ensure the Streamlit markdown container also gets the text color */
+        div[data-testid='stText'] {{ color: {text_color}; }}
+    """
+    
+    # --- NEW: Background Image CSS using ::before for contrast control ---
+    background_image_css = f"""
+        /* Set base background color for the app and ensure position is relative for the pseudo-element */
+        [data-testid="stAppViewContainer"] {{
+            background-color: {base_bg_color}; 
+            position: relative;
+            z-index: 1; /* Ensures content is above the pseudo-element */
+        }}
+
+        /* Create the pseudo-element to hold the image with low opacity */
+        [data-testid="stAppViewContainer"]::before {{
+            content: "";
+            position: fixed; /* Fixed so it covers the whole viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{emoji_url}');
+            background-size: cover; /* CHANGED: To display the image once, covering the screen */
+            background-repeat: no-repeat; /* CHANGED: To prevent tiling */
+            background-position: center; /* Center the image */
+            opacity: {background_opacity}; /* ADJUSTED: Controls the contrast/fade of the background image only */
+            z-index: -1; /* Puts the background image behind all content */
+            pointer-events: none; /* Allows clicks to go through to the main content */
+        }}
+    """
     
     # --- Combine all styles and apply to the app ---
     final_css = f"""
     <style>
-        {keyframes}
         {story_box_style}
         {ui_style}
-        .stApp {{ animation: moodCycle {duration}s ease-in-out infinite; }}
+        {background_image_css}
     </style>
     """
     st.markdown(final_css, unsafe_allow_html=True)
+apply_mood_theme(st.session_state.mood)
+
+# --- ADD THIS SIDEBAR CODE ---
+with st.sidebar:
+    st.title("Profile")
+    if st.session_state.username:
+        st.header(f"🧑‍💻 {st.session_state.username}")
+    else:
+        st.header("🧑‍💻 Guest")
+
+    st.markdown("---")
+    st.subheader("📝 Mood History")
+    
+    if not st.session_state.mood_history:
+        st.info("Your mood entries will appear here.")
+    else:
+        # Display in reverse order (most recent on top)
+        for entry in reversed(st.session_state.mood_history):
+                st.markdown(f"> <div style='color: #FFFFFF;'>{entry}</div>", unsafe_allow_html=True)
+# --- END OF SIDEBAR CODE ---
+
 @st.cache_data(show_spinner="Fetching live data...")
 def get_live_data():
     try:
@@ -145,7 +187,7 @@ def get_live_data():
         loc_res.raise_for_status()
         loc_data = loc_res.json()
         city, country = loc_data.get("city", "Unknown"), loc_data.get("country", "")
-        weather_api_key = weather_api_key
+        weather_api_key = "c87ed51b805675cdc2eababdb7cc294b"
         if not weather_api_key:
             st.error("Weather API key not found. Please add it to your Streamlit secrets.")
             return f'{city}, {country}', None
@@ -187,7 +229,7 @@ def preprocess_text(text):
     return ' '.join(tokens)
 
 def story_generation(sentiment, word_limit=150):
-    prompt = prompt = (
+    prompt = (
         f"Write a unique, suspenseful short story that instantly captures the reader’s attention in the first paragraph "
         f"with a mysterious or shocking event. The story should revolve around a main character who discovers a hidden truth "
         f"that turns their reality upside down. Introduce escalating layers of suspense, including red herrings, "
@@ -200,7 +242,7 @@ def story_generation(sentiment, word_limit=150):
         f"Keep the story under {word_limit} words, and ensure the tone is influenced by the user's *{sentiment}* feeling."
     )
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')  # ✅ updated model name
+        model = genai.GenerativeModel('gemini-2.5-flash')  # ✅ updated model name
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
@@ -219,6 +261,7 @@ st.markdown(f"<style>{get_local_css('style.css')}</style>", unsafe_allow_html=Tr
 
 st.markdown("""
 <style>
+/* Keeping this block for safety and to override default Streamlit style if necessary */
 .story-container {
     background-color: rgba(255, 255, 255, 0.5);
     border: 1px solid #ddd;
@@ -232,9 +275,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 # Top Info Bar
-col1, col2, col3 = st.columns(3, gap="large")
+col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(f'<div class="info-box"><img src="{utility_emojis["clock"]}" class="top-bar-emoji"><div class="info-text">{datetime.now().strftime("%d %b, %I:%M %p")}</div></div>', unsafe_allow_html=True)
 with col2:
@@ -263,21 +305,12 @@ if not st.session_state.username:
 else:
     st.markdown(f"<div id='greetingMessage'>Hello {st.session_state.username}, how are you feeling today?</div>", unsafe_allow_html=True)
     
-    mood_col1, mood_col2 = st.columns([1, 4])
-    with mood_col1:
-        st.markdown(f"<div class='emoji-box'><img src='{st.session_state.mood_emoji_url}' width='100'></div>", unsafe_allow_html=True)
-    with mood_col2:
+    mood_cols = st.columns(1)
+    with mood_cols[0]:
         st.markdown(f"<div id='moodDisplay'>Your current mood is: <strong>{st.session_state.mood}</strong></div>", unsafe_allow_html=True)
 
     mood_text = st.text_area("Type something about your mood...", placeholder=f"How are you feeling today, {st.session_state.username}?", height=100)
-    word_limit = st.slider(
-    "Select your desired story length (in words):",
-    min_value=50,
-    max_value=400,
-    value=150,
-    step=10,
-    help="Adjust the slider to control how long your story will be."
-)
+    word_limit = st.slider("Select Story Length (in words)", min_value=50, max_value=400, value=150, step=10)
 
     if st.button("✨ Generate Story ✨", use_container_width=True):
         if mood_text and pipeline:
@@ -285,11 +318,12 @@ else:
                 processed_text = preprocess_text(mood_text)
                 prediction = pipeline.predict([processed_text])
                 sentiment = 'Happy' if prediction[0] == 4 else 'Sad'
-                
+                apply_mood_theme(sentiment)
                 st.session_state.mood = sentiment
-            st.session_state.story = story_generation(sentiment, word_limit)
-            st.session_state.mood_emoji_url = mood_emojis.get(st.session_state.mood, mood_emojis["Neutral"])
-            st.rerun()  # ✅ instant theme + story refresh
+                st.session_state.story = story_generation(sentiment,word_limit=word_limit)
+                st.session_state.mood_emoji_url = mood_emojis.get(st.session_state.mood, mood_emojis["Neutral"])
+                st.session_state.mood_history.append(mood_text)
+                st.rerun()
         elif not mood_text:
             st.warning("Please type something about your mood first.", icon="✍️")
         else:
@@ -298,17 +332,6 @@ else:
     st.markdown("---")
     st.subheader("Your Adaptive Story")
     st.markdown(f"<div class='story-container'>{st.session_state.story}</div>", unsafe_allow_html=True)
-st.markdown("""
-<style>
-/* Change text color inside Streamlit text input */
-[data-testid="stTextInput"] input {
-    color: white;           /* Text color */
-    background-color: #222; /* Optional: background color */
-    font-weight: bold;       /* Optional styling */
-}
-</style>
-""", unsafe_allow_html=True)
-
 st.markdown("""
 <style>
 :root {
@@ -328,7 +351,6 @@ body, .main-container {
   font-weight: bold;
   text-align: center;
   transition: color 0.6s ease;
-  mix-blend-mode: difference; /* auto inverse based on bg */
 }
 
 /* Story box container */
@@ -342,12 +364,10 @@ body, .main-container {
   font-family: "Georgia", serif;
   transition: background-color 0.6s ease, color 0.6s ease;
   background-color: rgba(255, 255, 255, 0.15);
-  mix-blend-mode: difference; /* makes text inverse automatically */
 }
 
 /* All general text (paragraphs, labels, etc.) */
 .dynamic-text {
-  mix-blend-mode: difference;
   transition: color 0.6s ease;
 }
 
@@ -357,6 +377,7 @@ body, .main-container {
 }
 
 </style>
+<script>
 <script>
 function setDynamicTheme(bgColor) {
   // Apply background color
@@ -383,11 +404,13 @@ function invertColor(hex) {
 // setDynamicTheme('#222831');  // dark mood
 // setDynamicTheme('#FFD0C7');  // happy mood
 </script>
-""", unsafe_allow_html=True)
-# Pick a representative color for the current mood
-bg_color = color_palette.get(st.session_state.mood, ["#ffffff"])[0]
 
-# Inject JavaScript with the selected color
+</script>
+""", unsafe_allow_html=True)
+# Get the first color of the current mood
+bg_color = color_palette.get(st.session_state.mood, color_palette["Neutral"])[0]
+
+# Then call your JS function
 st.markdown(f"<script>setDynamicTheme('{bg_color}');</script>", unsafe_allow_html=True)
 
 # --- NEW: Footer with Box Styling and Hover Animation ---
@@ -418,12 +441,20 @@ st.markdown("""
     color: #555;
     font-size: 1.1em;
 }
+
+/* ENSURE FOOTER TEXT CONTRAST */
+.dynamic-footer .footer-heading, 
+.dynamic-footer .footer-description {
+    color: #1E1E1E !important; /* Forces dark color for contrast on light footer background */
+}
 </style>
 
 <footer class="dynamic-footer">
     <div class="footer-content">
         <h2 class="footer-heading">🌟 Mood Adaptive Story Generator</h2>
-        <p class="footer-description" style="color: black;">Dive into a world where every story resonates with your emotions. This app’s theme, tone, and narrative content adapt seamlessly to your current feelings — whether you’re joyful, melancholic, angry, or curious. Powered by advanced AI, it crafts personalized tales that reflect your mood, turning your emotions into immersive storytelling experiences. 💫</p>
+        <p class="footer-description">
+Experience stories that truly resonate with you — this app’s theme and narrative content adapt to your feelings, moods, and emotions in real time. Powered by AI, bringing your inner world to life. 💫
+</p>
     </div>
 </footer>
 """, unsafe_allow_html=True)
