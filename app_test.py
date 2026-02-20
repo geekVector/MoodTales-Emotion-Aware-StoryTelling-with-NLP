@@ -194,7 +194,7 @@ def get_live_data():
         return "Location unavailable", None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "sentiment_model_lg.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "sentiment_mode_lg.pkl")
 
 @st.cache_resource(show_spinner="Loading sentiment model...")
 def load_sentiment_model():
@@ -202,7 +202,7 @@ def load_sentiment_model():
         return joblib.load(MODEL_PATH)
     except FileNotFoundError:
         st.error(f"Sentiment model not found at: {MODEL_PATH}")
-        st.error("Please make sure 'sentiment_model1.pkl' is in the same folder as app.py.")
+        st.error("Please make sure 'sentiment_mode_lg.pkl' is in the same folder as app.py.")
         return None
 
 def download_nltk_data():
