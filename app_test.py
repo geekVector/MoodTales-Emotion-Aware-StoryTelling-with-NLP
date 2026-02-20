@@ -194,7 +194,7 @@ def get_live_data():
         return "Location unavailable", None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "sentiment_model1.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "sentiment_model_lg.pkl")
 
 @st.cache_resource(show_spinner="Loading sentiment model...")
 def load_sentiment_model():
