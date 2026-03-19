@@ -218,7 +218,7 @@ def preprocess_text(text):
     default_stopwords = set(stopwords.words('english'))
     custom_stopwords = default_stopwords - sentiment_words
     text = re.sub(r'https?:\/\/\S+|www\.\S+|@\w+|<@!?[\d]+>', '', text).lower()
-    tokens = [word for word in nltk.word_tokenize(text) if word.isalpha() and word not in custom_stopwords]
+    tokens = [word for word in tokens if (word.isalpha() or word in {"n't", "not"}) and word not in custom_stopwords]
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return ' '.join(tokens)
