@@ -1,4 +1,4 @@
-# STREAMLIT-AI
+# MOODTALES
 
 This Project was made as the major project during my Degree of BTech. 
 The idea behind creating this app was to make a AI based Program has grasp the mood or sentiment of the user and create some interesting stories based on that to uplift the mood of the user.
